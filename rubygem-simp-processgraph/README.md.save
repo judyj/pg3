@@ -1,0 +1,46 @@
+# simp-processgraph
+This holds the tool we are using to draw the process graphs
+
+This code allows you to plot the communications between your host and others.
+
+* It uses the `ss` (socket statistics) command with the `-npatuw` options
+-n, --numeric    Do not try to resolve service names.
+-a, --all    Display all sockets.
+-p, --processes    Show process using socket.
+-t, --tcp    Display only TCP sockets.
+-u, --udp    Display only UDP sockets.
+-w, --raw    Display only RAW sockets.
+* It creates an array of hashes of (sitename, hostname, domainname, localIP, localPort, process, user, peerIP, peerPort, socketUsers),
+and writes the interim data to a file,
+
+* Then it creates a graph, boxing up site, host, IP, ports, and connecting to destinations.
+You can link port-to-port (default), IP-to-IP, or process-to-process, each conglomerating the data underneath. 
+Lines are color-alternated to keep them distinct.
+
+In order to create the .png files, you must have graphviz installed
+```bash
+sudo yum install graphviz graphviz-devel graphviz-ruby
+```
+...and to ensure you can see the Ruby libraries, type:
+```bash
+export RUBYLIB=/usr/lib64/graphviz/ruby
+```
+
+The functions available under rake can be listed out by typing 
+`$ rake -T`
+
+To run the program, build and install the gem by running
+`$ rake pkg:install_gem`
+
+and run it
+`$ processgraph -s [sitename]`
+
+The usage can be found by typing
+`processgraph --help`
+
+or:
+type in the command below to run it right from the ruby:
+`$ ruby simp-processgraph.rb`
+
+The usage can be found by typing
+`processgraph -h`
