@@ -34,9 +34,10 @@ require 'socket'
 class ProcessList
   attr_accessor :infile, :outfile
 
-  def initialize(infile = nil,outfile = nil)
+  def initialize(infile = nil,outfile = nil, raw = nil)
     @infile = infile
     @outfile = outfile
+    @raw = raw
     @site_list = []
   end
 
@@ -48,6 +49,8 @@ class ProcessList
     @con_type = con_type
 
   # get the list of processes to a file
+    @rawtype = ".raw"
+    @sstype = ".ss"
     infile = 'process_list'
     @filetype = 'none'
 
@@ -62,11 +65,13 @@ class ProcessList
     end
     if File.directory?@inputfile
       @filetype = 'dir'
-    elsif ( (File.file?@inputfile) && (File.extname(@inputfile) == ".ss") )
+    elsif ( (File.file?@inputfile) && (File.extname(@inputfile) == "@sstype") )
       @filetype = 'file'
+    elsif ( (File.file?@inputfile) && (@raw == true) && (File.extname(@inputfile) == @rawtype) )
+      @filetype = 'raw'
     else
-     infile = @inputfile
-     @filetype = 'none'
+      infile = @inputfile
+      @filetype = 'none'
     end
 
 # output file
@@ -84,17 +89,31 @@ class ProcessList
       new_site = the_start.add_site(record["site_name"])
       new_host = new_site.add_host(record["hostname"])
       new_ip = new_host.add_ip(record["local_ip"])
+#     jj 7/2/17
+#     if we are on the www (firefox or chrome), let's just condense all those calls for now
+      proc_name = record["proc_name"]
+      port_name = record["local_port"]
+      if (proc_name == 'firefox' or proc_name == 'chrome')
+        port_name = "local"
+      end
       new_proc = new_ip.add_proc(record["proc_name"])
-      new_port = new_proc.add_port(record["local_port"])
-
+      new_port = new_proc.add_port(port_name)
+#     jj 7/2/17
 #     destinations
-#      dest_site = the_start.add_site(record["site_name"])
+#     dest_site = the_start.add_site(record["site_name"])
       if ( (record["peer_ip"]!= "*") && (record["peer_port"]!= "*"))
         dest_site = the_start.add_site("")
         dest_host = dest_site.add_host("")
-        dest_ip = dest_host.add_ip(record["peer_ip"])
-        dest_proc = dest_ip.add_proc(record["peer_proc"])
-        dest_port = dest_proc.add_port(record["peer_port"])
+        peer_proc = record["peer_proc"]
+        if (proc_name == 'firefox' or proc_name == 'chrome')
+          dest_ip = dest_host.add_ip("www")
+          dest_proc = dest_ip.add_proc(peer_proc)
+          dest_port = dest_proc.add_port("www")
+        else
+          dest_ip = dest_host.add_ip(record["peer_ip"])
+          dest_proc = dest_ip.add_proc(record["peer_proc"])
+          dest_port = dest_proc.add_port(record["peer_port"])
+        end
         new_port.add_connection(dest_port)
         new_proc.add_connection(dest_proc)
         new_ip.add_connection(dest_ip)
@@ -140,6 +159,8 @@ class ProcessList
     # rank LR draws left to right which is easier to read
     Gv.layout(gv, 'dot')
     Gv.setv(gv, 'rankdir', 'LR')
+    Gv.setv(gv, 'splines', 'true')
+    Gv.setv(gv, 'strict', 'true')
     upno = 0
     sitecount = 0
     hostcount = 0
@@ -488,18 +509,41 @@ def file_input(inputfile, outputfile, filetype, site_name)
   # this ss command lists processes to a file
   # comment out for a test file
   if @filetype == 'none'
-    %x(ss -npatuw > #{@inputfile})
-    @filetype = 'newfile'
+    @input1file = "#{@inputfile}#{@rawtype}"
+    %x(ss -npatuw > #{@input1file})
+    innewfiles = `pwd`.strip
+    innewfiles = "#{innewfiles}\/"
+    puts "rawtype is #{@rawtype}"
+    puts "inputfile is #{@inputfile}"
+    puts "input1file is #{@input1file}"
+    puts "innewfiles is #{innewfiles}"
+    @filetype = 'dir'
+    @raw = true
   end
   if @filetype == 'dir'
-    Dir.foreach(@inputfile) do |infile|
-      if infile.end_with?('ss')
-        infiles << @inputfile+'/'+infile
+    if @raw == true
+      puts " now dir infiles is #{infiles}"
+      Dir.foreach(innewfiles) do |infile|
+        puts "infile is #{infile}"
+        infile = infile
+        puts "infile is #{infile}"
+        if infile.end_with?(@rawtype)
+          infiles << innewfiles+'/'+infile
+        end
+      end    
+    else
+      Dir.foreach(@inputfile) do |infile|
+        if infile.end_with?(@sstype)
+          infiles << @inputfile+'/'+infile
+        end
       end
     end
 #   got through - check to ensure we got a file
     if infiles.size == 0
        puts "no files found"
+    else
+      puts "infiles: "
+      puts infiles
     end
     @inputfile = @inputfile+"_dir"
     if @outputfile == nil
@@ -512,107 +556,133 @@ def file_input(inputfile, outputfile, filetype, site_name)
   @outputfile = File.basename(@outputfile)
 
  # if new file, we need to convert the format
-  if (@filetype == 'newfile')
+  if (@raw == true) && (@filetype != 'dir')
     counter = 0
-    IO.foreach(@inputfile) do |line|
-      line.strip!
+    puts "infiles: "
+    puts  infiles
+# read each input file in the directory
+    infiles.each do |infile|
+      puts infile 
+      numProcs = 0
+      counter = 0
+      justfile1 = File.basename(infile,@rawtype)
+      p1 = justfile1.split('.')
+      justfile = p1[0]
+      puts "justfile is #{justfile}"
+#     read the file, one line at a time
+      IO.foreach(infile) do |line|
+        line.strip!
 
-#     create a hash for all the significant info
-      counter += 1
-      site_name = ''
-      domainname = ''
-      hostname = ''
-      local_ip = ''
-      local_proc = ''
-      peer_ip = ''
-      peer_proc = ''
-      proto = ''
-      port_name = ''
-      proc_user = ''
+#       create a hash for all the significant info
+        counter += 1
+        #site_name = ''
+        @site_name = justfile
+        domainname = ''
+        hostname = ''
+        local_ip = ''
+        local_proc = ''
+        peer_ip = ''
+        peer_proc = ''
+        proto = ''
+        port_name = ''
+        proc_user = ''
 
-#     break out the fields
+#       break out the fields
 #       *** for npatuw ***
-      begin
-        cancel = false
-        f1 = line.split(' ').map(&:strip)
-        state = f1[1]
-        rec_q = f1[2]
-        if (rec_q == "Recv-Q")
-          cancel = true
+        begin
+          cancel = false
+          f1 = line.split(' ').map(&:strip)
+          state = f1[1]
+          rec_q = f1[2]
+          if (rec_q == "Recv-Q")
+            cancel = true
+          end
+          send_q = f1[3]
+### judy is swapping the local and remote addresses if state is LISTEN or UNCONN 5/22/17
+          if state == "LISTEN" or state == "UNCONN"
+            local_add = f1[4] # BACK
+            peer_add = f1[5]
+          else
+            local_add = f1[4]
+            peer_add = f1[5]
+          end
+          socket_users = f1[6]
+#         for the local address split address and proc via colon
+          f2 = local_add.split(':').map(&:strip)
+          local_ip = f2[0]
+          if local_ip == "*"
+            local_ip = "ALL"
+          end
+          local_port = f2[1]
+          if (local_ip == '' && local_port == '')
+            cancel = true
+          end
+#         for the dest address split address and proc via colon
+          f3 = peer_add.split(':').map(&:strip)
+          peer_ip = f3[0]
+          peer_port = f3[1]
+#         create peer record and local record and associate the numbers
+          f4 = socket_users.split(':').map(&:strip)
+          proto = f4[1]
+          f5 = proto.split('"').map(&:strip)
+          proc_name = f5[1]
+          remain = f5[2]
+          f6 = remain.split('=').map(&:strip)
+          pidplus = f6[1]
+          f7 = pidplus.split(',').map(&:strip)
+          the_pid = f7[0]
+          proc_user = %x(ps --no-header -o user #{the_pid}).strip
+        rescue
+#          puts "ignoring line #{line} of #{infile}"
+#         ignore everything else
         end
-        send_q = f1[3]
-        local_add = f1[4]
-        peer_add = f1[5]
-        socket_users = f1[6]
-#       for the local address split address and proc via colon
-        f2 = local_add.split(':').map(&:strip)
-        local_ip = f2[0]
-        if local_ip == "*"
-          local_ip = "ALL"
-        end
-        local_port = f2[1]
-        if (local_ip == '' && local_port == '')
-          cancel = true
-        end
-#       for the dest address split address and proc via colon
-        f3 = peer_add.split(':').map(&:strip)
-        peer_ip = f3[0]
-        peer_port = f3[1]
-#       create peer record and local record and associate the numbers
-        f4 = socket_users.split(':').map(&:strip)
-        proto = f4[1]
-        f5 = proto.split('"').map(&:strip)
-        proc_name = f5[1]
-        remain = f5[2]
-        f6 = remain.split('=').map(&:strip)
-        pidplus = f6[1]
-        f7 = pidplus.split(',').map(&:strip)
-        the_pid = f7[0]
-        proc_user = %x(ps --no-header -o user #{the_pid}).strip
-      rescue
-#       ignore everything else
-      end
-#     current site and host
-      if (@site_name == '')
-        site_name = "here"
-      else
-        site_name = @site_name
-      end
-      hostname = "#{Socket.gethostname}"
-      domainname = ''
-      peer_proc = ''
-
-#     write both sets to hashes
-#    ignore header line
-      unless cancel
-        datarow = Hash.new
-        datarow["site_name"] = site_name
-        datarow["hostname"] = hostname
-        datarow["domainname"] = domainname
-        datarow["local_ip"] = local_ip
-        datarow["local_port"] = local_port
-        if proc_name != ''  && proc_user != ''
-          datarow["proc_name"] = "#{proc_name}\n#{proc_user}"
-        elsif proc_name
-          datarow["proc_name"] = proc_name
-        elsif (proc_user != '')
-          datarow["proc_name"] = proc_user
+#       current site and host
+        if (@site_name == '')
+          site_name = "here"
         else
-          datarow["proc_name"] = ''
+          site_name = @site_name
         end
-        datarow["process_name"] = proc_name
-        datarow["process_user"] = proc_user.strip
-        datarow["peer_ip"] = peer_ip
-        datarow["peer_proc"] = peer_proc
-        datarow["peer_port"] = peer_port
-        datarow["socket_users"] = socket_users
-        @all_comms << datarow
-      end # useful line
-    end   # end reading file
-    print_array(@all_comms, inputfile)
+        hostname = "#{Socket.gethostname}"
+        domainname = ''
+        peer_proc = ''
+
+#       write both sets to hashes
+#       ignore header line
+        unless cancel
+          datarow = Hash.new
+          datarow["site_name"] = site_name
+          datarow["hostname"] = hostname
+          datarow["domainname"] = domainname
+          datarow["local_ip"] = local_ip
+          datarow["local_port"] = local_port
+          if proc_name != ''  && proc_user != ''
+            datarow["proc_name"] = "#{proc_name}\n#{proc_user}"
+          elsif proc_name
+            datarow["proc_name"] = proc_name
+          elsif (proc_user != '')
+            datarow["proc_name"] = proc_user
+          else
+            datarow["proc_name"] = ''
+          end
+          datarow["process_name"] = proc_name
+          datarow["process_user"] = proc_user.strip
+          datarow["peer_ip"] = peer_ip
+          datarow["peer_proc"] = peer_proc
+          datarow["peer_port"] = peer_port
+          datarow["socket_users"] = socket_users
+          @all_comms << datarow
+        end # useful line
+      end   # end reading file
+      print_array(@all_comms, @outputfile)
+    #  return @all_comms
+    end #file_input
+    return @all_comms
   else # not new file
   # read each input file in the directory
     infiles.each do |infile|
+      justfile = File.basename(infile,@sstype)
+      puts "justfile is #{justfile}"
+      puts "infile is #{infile}"
       numProcs = 0
       counter = 0
 #     read the file, one line at a time
@@ -641,17 +711,19 @@ def file_input(inputfile, outputfile, filetype, site_name)
           peer_proc = ''
         rescue
 #         ignore everything else
-          puts "badly formatted file, ignoring line #{line}"
+          puts "error parsing - badly formatted file, ignoring line #{line}"
         end
 #       current domain and host
-        if (f1.size < 9)
-          puts "badly formatted file, ignoring line #{line}"
+        #if (f1.size < 9)
+        if (f1.size < 1)
+          puts "not enough fields - badly formatted file, ignoring line #{line}"
         else
           hostname = "#{Socket.gethostname}"
           domainname = ''
 #         write both sets to hashes
           datarow = Hash.new
-          datarow["site_name"] = site_name
+#          datarow["site_name"] = site_name
+          datarow["site_name"] = justfile
           datarow["hostname"] = hostname
           datarow["domainname"] = domainname
           datarow["local_ip"] = local_ip
