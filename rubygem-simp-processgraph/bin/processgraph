@@ -59,13 +59,7 @@ optsparse = OptionParser.new do |opts|
   end
 end # OptionParser
 
-begin
   optsparse.parse!
-rescue Exception=>e
-  puts "Error parsing: #{e}"
-  puts optsparse.banner
-  exit
-end
 
 unless site_name
   puts "Missing argument -s"
