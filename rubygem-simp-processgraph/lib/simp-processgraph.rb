@@ -12,11 +12,6 @@
 # -u, --udp    Display only UDP sockets.
 # -w, --raw    Display only RAW sockets.
 #
-# In order to run, you must set up your environment as described in https://simp-project.atlassian.net/wiki/display/SD/Setting+up+your+build+environment
-# (until you install bundler)
-#
-# `$bundle`
-#
 # In order to create the .png files, you must have graphviz installed
 # sudo yum install graphviz
 # ...and the ruby add-on to graphviz
@@ -512,23 +507,16 @@ def file_input(inputfile, outputfile, filetype, site_name)
     @input1file = "#{@inputfile}#{@rawtype}"
     %x(ss -npatuw > #{@input1file})
     innewfiles = `pwd`.strip
-    innewfiles = "#{innewfiles}\/"
-    puts "rawtype is #{@rawtype}"
-    puts "inputfile is #{@inputfile}"
-    puts "input1file is #{@input1file}"
-    puts "innewfiles is #{innewfiles}"
+    @inputfile = "#{innewfiles}\/"
     @filetype = 'dir'
     @raw = true
   end
   if @filetype == 'dir'
     if @raw == true
-      puts " now dir infiles is #{infiles}"
-      Dir.foreach(innewfiles) do |infile|
-        puts "infile is #{infile}"
+      Dir.foreach(@inputfile) do |infile|
         infile = infile
-        puts "infile is #{infile}"
         if infile.end_with?(@rawtype)
-          infiles << innewfiles+'/'+infile
+          infiles << @inputfile+'/'+infile
         end
       end    
     else
@@ -542,8 +530,8 @@ def file_input(inputfile, outputfile, filetype, site_name)
     if infiles.size == 0
        puts "no files found"
     else
-      puts "infiles: "
-      puts infiles
+      # puts "infiles: "
+      # puts infiles
     end
     @inputfile = @inputfile+"_dir"
     if @outputfile == nil
@@ -556,19 +544,15 @@ def file_input(inputfile, outputfile, filetype, site_name)
   @outputfile = File.basename(@outputfile)
 
  # if new file, we need to convert the format
-  if (@raw == true) && (@filetype != 'dir')
+  if (@raw == true) && (@filetype == 'dir')
     counter = 0
-    puts "infiles: "
-    puts  infiles
 # read each input file in the directory
     infiles.each do |infile|
-      puts infile 
       numProcs = 0
       counter = 0
       justfile1 = File.basename(infile,@rawtype)
       p1 = justfile1.split('.')
       justfile = p1[0]
-      puts "justfile is #{justfile}"
 #     read the file, one line at a time
       IO.foreach(infile) do |line|
         line.strip!
@@ -633,7 +617,7 @@ def file_input(inputfile, outputfile, filetype, site_name)
           the_pid = f7[0]
           proc_user = %x(ps --no-header -o user #{the_pid}).strip
         rescue
-#          puts "ignoring line #{line} of #{infile}"
+#         puts "ignoring line #{line} of #{infile}"
 #         ignore everything else
         end
 #       current site and host
@@ -681,8 +665,6 @@ def file_input(inputfile, outputfile, filetype, site_name)
   # read each input file in the directory
     infiles.each do |infile|
       justfile = File.basename(infile,@sstype)
-      puts "justfile is #{justfile}"
-      puts "infile is #{infile}"
       numProcs = 0
       counter = 0
 #     read the file, one line at a time
@@ -714,8 +696,8 @@ def file_input(inputfile, outputfile, filetype, site_name)
           puts "error parsing - badly formatted file, ignoring line #{line}"
         end
 #       current domain and host
-        #if (f1.size < 9)
-        if (f1.size < 1)
+#        if (f1.size < 9)
+        if (f1.size < 7)
           puts "not enough fields - badly formatted file, ignoring line #{line}"
         else
           hostname = "#{Socket.gethostname}"
