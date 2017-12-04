@@ -27,7 +27,7 @@ describe "testing input directory to process graph" do
   FileUtils.mkdir_p(outdir) unless File.directory?(outdir)
 
   Dir.chdir(outdir) do
-    the_graph = ProcessList.new($test_dir, "testdir")
+    the_graph = ProcessList.new($test_dir, "testdir", false)
     the_graph.process_data(site_name, con_type)
   end
 

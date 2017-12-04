@@ -18,7 +18,7 @@ describe "testing default to port" do
   FileUtils.mkdir_p(outdir) unless File.directory?(outdir)
 
   Dir.chdir(outdir) do
-    the_graph = ProcessList.new(nil, file_name)
+    the_graph = ProcessList.new(nil, file_name, false)
     the_graph.process_data(site_name, con_type)
   end
 

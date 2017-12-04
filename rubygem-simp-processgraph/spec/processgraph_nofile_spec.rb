@@ -18,7 +18,7 @@ site_name = "test_domain"
   end
 
   it "created input file based on default [process_list]" do
-     expect(File).to exist("#{outdir}/process_list")
+     expect(File).to exist("#{outdir}/process_list.raw")
   end
 
   it "created dot file based on default" do
