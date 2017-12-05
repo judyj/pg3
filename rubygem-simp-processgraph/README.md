@@ -9,11 +9,11 @@ A tool to draw the process graphs
 #### Table of Contents
 1. [Overview](#overview)
 2. [Setup](#setup)
-* [Beginning with simp-processgraph](#beginning-with-simp-processgraph)
-3. [Methods](#methods)
+3. [Beginning with simp-processgraph](#beginning-with-simp-processgraph)
 4. [Environment variables](#environment-variables)
-5. [Examples](#examples)
-6. [License](#license)
+5. [Methods](#methods)
+6. [Examples](#examples)
+7. [License](#license)
 
 ## Overview
 
@@ -42,9 +42,9 @@ In order to create the .png files, you must have graphviz installed
 sudo yum install graphviz graphviz-devel graphviz-ruby
 ```
 Build and install the gem by running
-
-`$ rake pkg:install_gem`
-
+```bash
+rake pkg:install_gem`
+```
 (to see other rake options, run `rake -T`)
 
 ### Beginning with simp-processgraph
@@ -55,16 +55,15 @@ Add this to your project's `Gemfile`:
 gem 'simp-processgraph'
 ```
 
-## Methods
-
-
-
 ## Environment variables
 
 To ensure you can see the Ruby libraries, type:
 ```bash
 export RUBYLIB=/usr/lib64/graphviz/ruby
 ```
+
+## Methods
+
 
 ## Examples
 
