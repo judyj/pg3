@@ -62,6 +62,19 @@ To ensure you can see the Ruby libraries, type:
 export RUBYLIB=/usr/lib64/graphviz/ruby
 ```
 
+
+And you must be running the system ruby to work properly with that library, so type:
+```bash
+rvm use system
+```
+if rvm is not installed, you can set it up like this:
+``
+$ gpg2 --keyserver hkp://keys.gnupg.net --recv-keys \
+    409B6B1796C275462A1703113804BB82D39DC0E3
+$ \curl -sSL https://get.rvm.io | bash -s stable --ruby=2.1.9
+$ source ~/.rvm/scripts/rvm
+``
+
 ## Methods
 
 
@@ -81,4 +94,4 @@ or, type in the command below to run it right from the ruby:
 
 
 ## License
-See [LICENSE](LICENSE)
+See [LICENSE](LICENSE.md)
