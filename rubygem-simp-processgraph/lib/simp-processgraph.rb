@@ -156,6 +156,7 @@ class ProcessList
     Gv.setv(gv, 'rankdir', 'LR')
     Gv.setv(gv, 'splines', 'true')
     Gv.setv(gv, 'strict', 'true')
+    # Gv.setv(gv, 'constraint', 'true') # test jj 12/11/17
     upno = 0
     sitecount = 0
     hostcount = 0
@@ -693,12 +694,12 @@ def file_input(inputfile, outputfile, filetype, site_name)
           peer_proc = ''
         rescue
 #         ignore everything else
-          puts "error parsing - badly formatted file, ignoring line #{line}"
+          puts "error parsing #{infile} - badly formatted file, ignoring line #{line}"
         end
 #       current domain and host
 #        if (f1.size < 9)
         if (f1.size < 7)
-          puts "not enough fields - badly formatted file, ignoring line #{line}"
+          puts "#{infile} not enough fields - badly formatted file, ignoring line #{line}"
         else
           hostname = "#{Socket.gethostname}"
           domainname = ''

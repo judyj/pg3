@@ -43,7 +43,7 @@ sudo yum install graphviz graphviz-devel graphviz-ruby
 ```
 Build and install the gem by running
 ```bash
-rake pkg:install_gem`
+rake pkg:install_gem
 ```
 (to see other rake options, run `rake -T`)
 
@@ -70,15 +70,15 @@ rvm use system
 if rvm is not installed, you can set it up like this:
 ```bash
 $ gpg2 --keyserver hkp://keys.gnupg.net --recv-keys \
-    409B6B1796C275462A1703113804BB82D39DC0E3`
+    409B6B1796C275462A1703113804BB82D39DC0E3
 ```
 
 ```bash
-$ \curl -sSL https://get.rvm.io | bash -s stable --ruby=2.1.9`
+$ \curl -sSL https://get.rvm.io | bash -s stable --ruby=2.1.9
 ```
 
 ```bash
-$ source ~/.rvm/scripts/rvm`
+$ source ~/.rvm/scripts/rvm
 ```
 
 ## Methods
