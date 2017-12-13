@@ -41,28 +41,6 @@ In order to create the .png files, you must have graphviz installed
 ```bash
 sudo yum install graphviz graphviz-devel graphviz-ruby
 ```
-Build and install the gem by running
-```bash
-rake pkg:install_gem
-```
-(to see other rake options, run `rake -T`)
-
-### Beginning with simp-processgraph
-
-Add this to your project's `Gemfile`:
-
-```ruby
-gem 'simp-processgraph'
-```
-
-## Environment variables
-
-To ensure you can see the Ruby libraries, type:
-```bash
-export RUBYLIB=/usr/lib64/graphviz/ruby
-```
-
-
 And you must be running the system ruby to work properly with that library, so type:
 ```bash
 rvm use system
@@ -80,6 +58,28 @@ $ \curl -sSL https://get.rvm.io | bash -s stable --ruby=2.1.9
 ```bash
 $ source ~/.rvm/scripts/rvm
 ```
+
+## Environment variables
+
+To ensure you can see the Ruby libraries, type:
+```bash
+export RUBYLIB=/usr/lib64/graphviz/ruby
+```
+
+### Beginning with simp-processgraph
+
+Add this to your project's `Gemfile`:
+
+```ruby
+gem 'simp-processgraph'
+```
+
+Build and install the gem by running
+```bash
+rake pkg:install_gem
+```
+(to see other rake options, run `rake -T`)
+
 
 ## Methods
 
