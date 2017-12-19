@@ -1,0 +1,60 @@
+Netid  State      Recv-Q Send-Q Local Address:Port               Peer Address:Port              
+udp    UNCONN     0      0         *:44978                 *:*                  
+udp    UNCONN     0      0         *:5353                  *:*                   users:(("chrome",pid=24864,fd=108))
+udp    UNCONN     0      0      10.0.122.1:53                    *:*                  
+udp    UNCONN     0      0      *  %virbr0:67                    *:*                  
+udp    UNCONN     0      0         *:68                    *:*                  
+udp    UNCONN     0      0      10.0.0.1:123                   *:*                  
+udp    UNCONN     0      0      10.0.122.1:123                   *:*                  
+udp    UNCONN     0      0      10.0.71.152:123                   *:*                  
+udp    UNCONN     0      0      127.0.0.1:123                   *:*                  
+udp    UNCONN     0      0         *:123                   *:*                  
+udp    UNCONN     0      0        :::5353                 :::*                   users:(("chrome",pid=24864,fd=130))
+udp    UNCONN     0      0        :::5353                 :::*                   users:(("chrome",pid=24864,fd=129))
+udp    UNCONN     0      0        :::48839                :::*                  
+udp    UNCONN     0      0      fe80::fc54:ff:fe85:de11%vnet0:123                  :::*                  
+udp    UNCONN     0      0      fe80::529a:4cff:fe4b:d002%br1:123                  :::*                  
+udp    UNCONN     0      0       ::1:123                  :::*                  
+udp    UNCONN     0      0        :::123                  :::*                  
+tcp    LISTEN     0      1      10.0.0.1:5900                  *:*                  
+tcp    LISTEN     0      5      10.168.122.1:53                    *:*                  
+tcp    LISTEN     0      128       *:22                    *:*                  
+tcp    LISTEN     0      100    127.0.0.1:25                    *:*                  
+tcp    LISTEN     0      128    127.0.0.1:873                   *:*                  
+tcp    ESTAB      0      0      10.0.71.152:57876              10.0.5.238:443                 users:(("firefox",pid=24713,fd=78))
+tcp    TIME-WAIT  0      0      10.0.71.152:57258              10.0.7.227:443                
+tcp    ESTAB      0      0      10.0.71.152:58148              10.0.236.99:443                 users:(("chrome",pid=24864,fd=259))
+tcp    ESTAB      0      0      10.0.71.152:45398              10.0.8.14:443                 users:(("firefox",pid=24713,fd=86))
+tcp    ESTAB      0      0      10.0.71.152:49994              10.0.206.189:443                 users:(("chrome",pid=24864,fd=165))
+tcp    ESTAB      0      0      10.0.71.152:51614              10.0.5.229:443                 users:(("chrome",pid=24864,fd=195))
+tcp    ESTAB      0      0      10.0.71.152:57734              10.0.142.67:443                 users:(("firefox",pid=24713,fd=83))
+tcp    ESTAB      0      0      10.0.71.152:49780              10.0.206.189:443                 users:(("firefox",pid=24713,fd=79))
+tcp    ESTAB      0      0      10.0.71.152:49730              10.0.206.189:443                 users:(("firefox",pid=24713,fd=70))
+tcp    ESTAB      0      0      10.0.71.152:46792              10.0.5.227:443                 users:(("chrome",pid=24864,fd=226))
+tcp    ESTAB      0      0      10.0.71.152:50660              10.0.253.125:443                 users:(("firefox",pid=24713,fd=108))
+tcp    ESTAB      0      0      10.0.71.152:58098              10.0.5.238:443                 users:(("chrome",pid=24864,fd=98))
+tcp    ESTAB      0      0      10.0.71.152:52234              10.0.19.130:443                 users:(("firefox",pid=24713,fd=84))
+tcp    ESTAB      0      0      10.0.71.152:59460              10.0.71.106:389                
+tcp    ESTAB      0      0      10.0.71.152:50436              10.0.95.221:443                 users:(("chrome",pid=24864,fd=231))
+tcp    ESTAB      0      0      10.0.71.152:50820              10.0.253.125:443                 users:(("firefox",pid=24713,fd=107))
+tcp    ESTAB      0      0      10.0.71.152:45400              10.0.8.14:443                 users:(("firefox",pid=24713,fd=89))
+tcp    ESTAB      0      0      10.0.71.152:54114              10.0.15.78:443                 users:(("chrome",pid=24864,fd=127))
+tcp    ESTAB      0      0      10.0.71.152:59284              10.0.73.2:443                 users:(("firefox",pid=24713,fd=85))
+tcp    TIME-WAIT  0      0      10.0.71.152:58150              10.0.5.238:443                
+tcp    TIME-WAIT  0      0      10.0.71.152:58264              10.0.13.226:443                
+tcp    ESTAB      0      0      10.0.71.152:54116              10.0.15.78:443                 users:(("chrome",pid=24864,fd=160))
+tcp    ESTAB      0      0      10.0.71.152:51254              10.0.39.66:443                 users:(("firefox",pid=24713,fd=42))
+tcp    ESTAB      0      0      10.0.71.152:58168              10.0.5.238:443                 users:(("chrome",pid=24864,fd=159))
+tcp    ESTAB      0      0      10.0.71.152:43490              10.0.12.238:443                 users:(("chrome",pid=24864,fd=225))
+tcp    ESTAB      0      0      10.0.71.152:33132              10.0.160.159:443                 users:(("firefox",pid=24713,fd=88))
+tcp    ESTAB      0      0      10.0.71.152:47846              10.0.42.11:443                 users:(("chrome",pid=24864,fd=149))
+tcp    ESTAB      0      0      10.0.71.152:705                10.0.71.111:2049               
+tcp    TIME-WAIT  0      0      10.0.71.152:44402              10.0.79.206:443                
+tcp    ESTAB      0      0      10.0.71.152:51632              10.0.5.229:443                 users:(("firefox",pid=24713,fd=80))
+tcp    ESTAB      0      0      10.0.71.152:49762              10.0.206.189:443                 users:(("firefox",pid=24713,fd=52))
+tcp    ESTAB      0      0      10.0.71.152:38646              10.0.133.191:443                 users:(("chrome",pid=24864,fd=181))
+tcp    ESTAB      0      0      10.0.71.152:33190              10.0.160.159:443                 users:(("firefox",pid=24713,fd=81))
+tcp    TIME-WAIT  0      0      10.0.71.152:35620              10.0.217.164:443                
+tcp    ESTAB      0      0      10.0.71.152:42198              10.0.192.188:5228                users:(("chrome",pid=24864,fd=128))
+tcp    TIME-WAIT  0      0      10.0.71.152:49080              10.0.5.225:443                
+tcp    LISTEN     0      100     ::1:25                   :::*                  

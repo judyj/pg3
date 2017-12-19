@@ -16,6 +16,7 @@ con_type = 0
 
 optsparse = OptionParser.new do |opts|
   opts.banner = "Usage: processgraph -s sitename [options]"
+  opts.banner += "\nNote: use full pathname for files and directories\n"
   opts.on('-h', '--help', 'Help') do
     puts opts
     exit

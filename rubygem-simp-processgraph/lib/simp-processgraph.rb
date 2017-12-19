@@ -88,8 +88,9 @@ class ProcessList
 #     if we are on the www (firefox or chrome), let's just condense all those calls for now
       proc_name = record["proc_name"]
       port_name = record["local_port"]
-      if (proc_name == 'firefox' or proc_name == 'chrome')
+      if (proc_name == 'firefox' or proc_name == 'chrome' or proc_name == 'browser')
         port_name = "local"
+        proc_name = "browser"
       end
       new_proc = new_ip.add_proc(record["proc_name"])
       new_port = new_proc.add_port(port_name)
@@ -100,9 +101,9 @@ class ProcessList
         dest_site = the_start.add_site("")
         dest_host = dest_site.add_host("")
         peer_proc = record["peer_proc"]
-        if (proc_name == 'firefox' or proc_name == 'chrome')
+        if (proc_name == 'firefox' or proc_name == 'chrome' or proc_name == 'browser')
           dest_ip = dest_host.add_ip("www")
-          dest_proc = dest_ip.add_proc(peer_proc)
+          dest_proc = dest_ip.add_proc("browser")
           dest_port = dest_proc.add_port("www")
         else
           dest_ip = dest_host.add_ip(record["peer_ip"])
@@ -502,6 +503,8 @@ def file_input(inputfile, outputfile, filetype, site_name)
   @filetype = filetype
   @site_name = site_name
 
+puts "filetype is #{filetype}"
+
   # this ss command lists processes to a file
   # comment out for a test file
   if @filetype == 'none'
@@ -634,6 +637,14 @@ def file_input(inputfile, outputfile, filetype, site_name)
 #       write both sets to hashes
 #       ignore header line
         unless cancel
+# if you are on the www, let's fix this now
+         if (proc_name == 'firefox' or proc_name == 'chrome' or proc_name == 'browser')
+            proc_name = "browser"
+            local_port = "local"
+            peer_ip = "www"
+            peer_port = "www"
+            peer_proc = "browser"
+          end
           datarow = Hash.new
           datarow["site_name"] = site_name
           datarow["hostname"] = hostname
@@ -701,6 +712,15 @@ def file_input(inputfile, outputfile, filetype, site_name)
         if (f1.size < 7)
           puts "#{infile} not enough fields - badly formatted file, ignoring line #{line}"
         else
+# if you are on the www, let's fix this now
+         if (proc_name == 'firefox' or proc_name == 'chrome' or proc_name == 'browser')
+            proc_name = "browser"
+            local_port = "local"
+            peer_ip = "www"
+            peer_port = "www"
+            peer_proc = "browser"
+          end
+
           hostname = "#{Socket.gethostname}"
           domainname = ''
 #         write both sets to hashes
