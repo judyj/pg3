@@ -631,6 +631,10 @@ puts "filetype is #{filetype}"
           site_name = @site_name
         end
         hostname = "#{Socket.gethostname}"
+# judy
+        host = File.basename(infile, ".*")
+        hostname = File.basename(host, ".*")
+
         domainname = ''
         peer_proc = ''
 
@@ -722,6 +726,9 @@ puts "filetype is #{filetype}"
           end
 
           hostname = "#{Socket.gethostname}"
+# judy fix this to get the right part of the file 
+          host = File.basename(infile, ".*")
+          hostname = File.basename(host, ".*")
           domainname = ''
 #         write both sets to hashes
           datarow = Hash.new
