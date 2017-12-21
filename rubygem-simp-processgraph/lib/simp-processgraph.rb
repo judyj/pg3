@@ -51,18 +51,16 @@ class ProcessList
 
   # check to see if we input a file
     if @inputfile == nil
-#     if file with generic name exists, back it up just in case
-      if File.file?infile
-        File.rename(infile, "#{infile}.bak")
-      end
       @filetype = 'file'
       @inputfile = infile
     end
+
     if File.directory?@inputfile
       @filetype = 'dir'
-    elsif ( (File.file?@inputfile) && (File.extname(@inputfile) == "@sstype") )
+    elsif ( (File.file?@inputfile) && ((File.extname(@inputfile)) == @sstype) )
       @filetype = 'file'
-    elsif ( (File.file?@inputfile) && (@raw == true) && (File.extname(@inputfile) == @rawtype) )
+    elsif ( (File.file?@inputfile) && ((@raw == true) || (File.extname(@inputfile) == @rawtype)) )
+#    elsif ( (File.file?@inputfile) && ((File.extname(@inputfile)) == @rawtype) )
       @filetype = 'raw'
     else
       infile = @inputfile
@@ -503,13 +501,14 @@ def file_input(inputfile, outputfile, filetype, site_name)
   @filetype = filetype
   @site_name = site_name
 
-puts "filetype is #{filetype}"
+  new_ss = false # set to true if we are running ss the first time to get the correct hostname
 
   # this ss command lists processes to a file
   # comment out for a test file
   if @filetype == 'none'
     @input1file = "#{@inputfile}#{@rawtype}"
     %x(ss -npatuw > #{@input1file})
+    new_ss = true  # so we know to use our own hostname
     innewfiles = `pwd`.strip
     @inputfile = "#{innewfiles}\/"
     @filetype = 'dir'
@@ -533,9 +532,6 @@ puts "filetype is #{filetype}"
 #   got through - check to ensure we got a file
     if infiles.size == 0
        puts "no files found"
-    else
-      # puts "infiles: "
-      # puts infiles
     end
     @inputfile = @inputfile+"_dir"
     if @outputfile == nil
@@ -548,7 +544,8 @@ puts "filetype is #{filetype}"
   @outputfile = File.basename(@outputfile)
 
  # if new file, we need to convert the format
-  if (@raw == true) && (@filetype == 'dir')
+#  if (@raw == true) && (@filetype == 'dir')
+  if (@raw == true)
     counter = 0
 # read each input file in the directory
     infiles.each do |infile|
@@ -564,7 +561,11 @@ puts "filetype is #{filetype}"
 #       create a hash for all the significant info
         counter += 1
         #site_name = ''
-        @site_name = justfile
+        if (new_ss) then
+          #@site_name = @site_name
+        else
+          @site_name = justfile
+        end
         domainname = ''
         hostname = ''
         local_ip = ''
@@ -621,8 +622,12 @@ puts "filetype is #{filetype}"
           the_pid = f7[0]
           proc_user = %x(ps --no-header -o user #{the_pid}).strip
         rescue
-#         puts "ignoring line #{line} of #{infile}"
 #         ignore everything else
+          # puts "error parsing #{infile} - badly formatted raw file, ignoring line #{line}"
+        end
+#       current domain and host
+        if (f1.size < 7)
+          # puts "not enough fields #{infile} - badly formatted raw file, ignoring line #{line}"
         end
 #       current site and host
         if (@site_name == '')
@@ -630,10 +635,14 @@ puts "filetype is #{filetype}"
         else
           site_name = @site_name
         end
-        hostname = "#{Socket.gethostname}"
-# judy
-        host = File.basename(infile, ".*")
-        hostname = File.basename(host, ".*")
+
+# judy - get hostname from filename i we didnt just run the ss command
+        if (new_ss) then
+          hostname = "#{Socket.gethostname}"
+        else
+          host = File.basename(infile, ".*")
+          hostname = File.basename(host, ".*")
+        end
 
         domainname = ''
         peer_proc = ''
@@ -677,7 +686,7 @@ puts "filetype is #{filetype}"
     #  return @all_comms
     end #file_input
     return @all_comms
-  else # not new file
+  else # not raw
   # read each input file in the directory
     infiles.each do |infile|
       justfile = File.basename(infile,@sstype)
@@ -686,6 +695,7 @@ puts "filetype is #{filetype}"
 #     read the file, one line at a time
       IO.foreach(infile) do |line|
         line.strip!
+        puts infile
 
         begin
           cancel = false
@@ -709,12 +719,11 @@ puts "filetype is #{filetype}"
           peer_proc = ''
         rescue
 #         ignore everything else
-          puts "error parsing #{infile} - badly formatted file, ignoring line #{line}"
+          # puts "error parsing #{infile} - badly formatted ss file, ignoring line\n #{line}"
         end
 #       current domain and host
-#        if (f1.size < 9)
         if (f1.size < 7)
-          puts "#{infile} not enough fields - badly formatted file, ignoring line #{line}"
+          # puts "#{infile} not enough fields - badly formatted ss file, ignoring line\n #{line}"
         else
 # if you are on the www, let's fix this now
          if (proc_name == 'firefox' or proc_name == 'chrome' or proc_name == 'browser')
@@ -725,10 +734,14 @@ puts "filetype is #{filetype}"
             peer_proc = "browser"
           end
 
-          hostname = "#{Socket.gethostname}"
-# judy fix this to get the right part of the file 
-          host = File.basename(infile, ".*")
-          hostname = File.basename(host, ".*")
+# judy fix this to get the correct hostname - if brand new figure it out, if not, use the filename
+          if new_ss
+            hostname = "#{Socket.gethostname}"
+          else
+            host = File.basename(infile, ".*")
+            hostname = File.basename(host, ".*")
+          end
+
           domainname = ''
 #         write both sets to hashes
           datarow = Hash.new
@@ -753,7 +766,7 @@ puts "filetype is #{filetype}"
           datarow["peer_port"] = peer_port
           datarow["socket_users"] = socket_users
           datarow["peer_proc"] = peer_proc
-          @all_comms << datarow
+           @all_comms << datarow
         end #enough fields
       end   # end reading file
     end # end array of files
