@@ -561,11 +561,11 @@ def file_input(inputfile, outputfile, filetype, site_name)
 #       create a hash for all the significant info
         counter += 1
         #site_name = ''
-        if (new_ss) then
-          #@site_name = @site_name
-        else
-          @site_name = justfile
-        end
+        #if (new_ss) then
+          @site_name = @site_name
+        #else
+          #@site_name = justfile
+        #end
         domainname = ''
         hostname = ''
         local_ip = ''
@@ -630,11 +630,11 @@ def file_input(inputfile, outputfile, filetype, site_name)
           # puts "not enough fields #{infile} - badly formatted raw file, ignoring line #{line}"
         end
 #       current site and host
-        if (@site_name == '')
-          site_name = "here"
-        else
+        #if (@site_name == '')
+        #  site_name = "here"
+        #else
           site_name = @site_name
-        end
+        #end
 
 # judy - get hostname from filename i we didnt just run the ss command
         if (new_ss) then
@@ -700,7 +700,7 @@ def file_input(inputfile, outputfile, filetype, site_name)
         begin
           cancel = false
           f1 = line.split(',').map(&:strip)
-          site_name = f1[0]
+          # judy sitename fix site_name = f1[0]
           hostname = f1[1]
           domainname = f1[2]
           local_ip = f1[3]
@@ -745,8 +745,8 @@ def file_input(inputfile, outputfile, filetype, site_name)
           domainname = ''
 #         write both sets to hashes
           datarow = Hash.new
-#          datarow["site_name"] = site_name
-          datarow["site_name"] = justfile
+          datarow["site_name"] = site_name
+# judy sitename fix          datarow["site_name"] = justfile
           datarow["hostname"] = hostname
           datarow["domainname"] = domainname
           datarow["local_ip"] = local_ip
