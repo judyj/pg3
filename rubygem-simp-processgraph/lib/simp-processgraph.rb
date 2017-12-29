@@ -43,6 +43,9 @@ class ProcessList
     @site_name = site_name
     @con_type = con_type
 
+  # tell the user we got your back
+    $stdout.puts "reading data"
+
   # get the list of processes to a file
     @rawtype = ".raw"
     @sstype = ".ss"
@@ -242,6 +245,9 @@ class ProcessList
     colors = Array['yellow','green','orange','violet', 'turquoise', 'gray','brown']
     count = 0
     outputfile = outfile
+
+# tell the user what we're up to
+    $stdout.puts "assembling graph"
 
 #   progress through the sites
     @site_list.each do |sitenm|
@@ -551,11 +557,11 @@ def file_input(inputfile, outputfile, filetype, site_name)
  # if new file, we need to convert the format
 #  if (@raw == true) && (@filetype == 'dir')
   if (@raw == true)
-    counter = 0
+    @file_counter = 0
 # read each input file in the directory
     infiles.each do |infile|
       numProcs = 0
-      counter = 0
+      @file_counter += 1
       justfile1 = File.basename(infile,@rawtype)
       p1 = justfile1.split('.')
       justfile = p1[0]
@@ -564,7 +570,6 @@ def file_input(inputfile, outputfile, filetype, site_name)
         line.strip!
 
 #       create a hash for all the significant info
-        counter += 1
         #site_name = ''
         #if (new_ss) then
           @site_name = @site_name
@@ -690,13 +695,14 @@ def file_input(inputfile, outputfile, filetype, site_name)
       print_array(@all_comms, @outputfile)
     #  return @all_comms
     end #file_input
+    $stdout.puts "read #{@file_counter} files"
     return @all_comms
   else # not raw
   # read each input file in the directory
     infiles.each do |infile|
       justfile = File.basename(infile,@sstype)
       numProcs = 0
-      counter = 0
+      @file_counter = 0
 #     read the file, one line at a time
       IO.foreach(infile) do |line|
         line.strip!
@@ -773,7 +779,9 @@ def file_input(inputfile, outputfile, filetype, site_name)
            @all_comms << datarow
         end #enough fields
       end   # end reading file
+      @file_counter += 1
     end # end array of files
+    $stdout.puts "read #{@file_counter} files"
   end # new file
   print_array(@all_comms, @outputfile)
   return @all_comms
