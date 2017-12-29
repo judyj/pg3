@@ -44,7 +44,7 @@ task :spec do
   rtnval = `rspec spec > spec.log`
   puts " test results are #{$?}, logged in spec.log"
   if $? != 0
-    puts "spec tests failed, results in spec.log"
+    stderr.puts "spec tests failed, results in spec.log"
   else
     puts "spec tests passed - results are #{$?}, logged in spec.log"
   end

@@ -316,7 +316,12 @@ class ProcessList
     end
     success = Gv.write(gv, "#{outputfile}.dot")
 #   for now, create the dot this way, see if we can find correction
-    %x(dot -Tpng #{outputfile}.dot -o #{outputfile}.png).strip
+    #results = %x(dot -Tpng #{outputfile}.dot -o #{outputfile}.png)
+    results = `dot -Tpng #{outputfile}.dot -o #{outputfile}.png 2> /dev/null`
+    if $?.success? then
+    else
+      $stderr.puts "dot command failed"
+    end
   end #graph_connections
 end #ProcessList
 
@@ -531,7 +536,7 @@ def file_input(inputfile, outputfile, filetype, site_name)
     end
 #   got through - check to ensure we got a file
     if infiles.size == 0
-       puts "no files found"
+       $stderr.puts "no files found"
     end
     @inputfile = @inputfile+"_dir"
     if @outputfile == nil
@@ -695,7 +700,6 @@ def file_input(inputfile, outputfile, filetype, site_name)
 #     read the file, one line at a time
       IO.foreach(infile) do |line|
         line.strip!
-        puts infile
 
         begin
           cancel = false
