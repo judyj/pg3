@@ -699,10 +699,11 @@ def file_input(inputfile, outputfile, filetype, site_name)
     return @all_comms
   else # not raw
   # read each input file in the directory
+    @file_counter = 0
     infiles.each do |infile|
       justfile = File.basename(infile,@sstype)
       numProcs = 0
-      @file_counter = 0
+      @file_counter += 1
 #     read the file, one line at a time
       IO.foreach(infile) do |line|
         line.strip!
@@ -779,7 +780,6 @@ def file_input(inputfile, outputfile, filetype, site_name)
            @all_comms << datarow
         end #enough fields
       end   # end reading file
-      @file_counter += 1
     end # end array of files
     $stdout.puts "read #{@file_counter} files"
   end # new file
